@@ -92,6 +92,11 @@ pub fn build(b: *std.Build) void {
     if (options.enable_ztracy) tracy.root_module.addCMacro("TRACY_ENABLE", "");
     if (options.enable_fibers) tracy.root_module.addCMacro("TRACY_FIBERS", "");
     if (options.on_demand) tracy.root_module.addCMacro("TRACY_ON_DEMAND", "");
+    if (options.callstack > 0) {
+        var callstack_buffer: [64]u8 = undefined;
+        const callstack_str_len = std.fmt.printInt(&callstack_buffer, @as(u32, options.callstack), 10, .lower, .{});
+        tracy.root_module.addCMacro("TRACY_CALLSTACK", callstack_buffer[0..callstack_str_len]);
+    }
 
     tracy.root_module.link_libc = true;
     if (target.result.abi != .msvc) {
