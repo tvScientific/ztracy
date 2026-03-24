@@ -55,6 +55,10 @@ pub fn build(b: *std.Build) void {
         translate_c.defineCMacro("TRACY_CALLSTACK", callstack_buffer[0..callstack_str_len]);
     }
 
+    if (options.enable_fibers) {
+        translate_c.defineCMacro("TRACY_FIBERS", "");
+    }
+
     const ztracy = b.addModule("root", .{
         .root_source_file = b.path("src/ztracy.zig"),
         .imports = &.{
