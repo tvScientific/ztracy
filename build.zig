@@ -81,6 +81,7 @@ pub fn build(b: *std.Build) void {
         .file = b.path("libs/tracy/TracyClient.cpp"),
         .flags = &.{
             "-fno-sanitize=undefined",
+            "-std=c++17",
         },
     });
 
