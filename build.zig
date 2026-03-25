@@ -30,6 +30,11 @@ pub fn build(b: *std.Build) void {
             "shared",
             "Build as shared library",
         ) orelse false,
+        .libunwind = b.option(
+            bool,
+            "libunwind",
+            "Link against libunwind (only has an effect on non-Windows platforms)",
+        ) orelse false,
     };
 
     const options_step = b.addOptions();
@@ -90,7 +95,6 @@ pub fn build(b: *std.Build) void {
             "-std=c++17",
         },
     });
-    // tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
 
     if (options.enable_ztracy) tracy.root_module.addCMacro("TRACY_ENABLE", "");
     if (options.enable_fibers) tracy.root_module.addCMacro("TRACY_FIBERS", "");
@@ -107,7 +111,6 @@ pub fn build(b: *std.Build) void {
     } else {
         tracy.root_module.addCMacro("fileno", "_fileno");
     }
-    // tracy.linkSystemLibrary("unwind");
 
     switch (target.result.os.tag) {
         .windows => {
@@ -117,6 +120,12 @@ pub fn build(b: *std.Build) void {
         .macos => {
             if (b.lazyDependency("system_sdk", .{})) |system_sdk| {
                 tracy.root_module.addFrameworkPath(system_sdk.path("System/Library/Frameworks"));
+            }
+        },
+        .linux => {
+            if (options.libunwind) {
+                tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
+                tracy.root_module.linkSystemLibrary("unwind", .{});
             }
         },
         else => {},
