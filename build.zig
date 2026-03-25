@@ -40,6 +40,11 @@ pub fn build(b: *std.Build) void {
             "verbose",
             "Enable verbose output from Tracy",
         ) orelse false,
+        .debuginfod = b.option(
+            bool,
+            "debuginfod",
+            "Enable debuginfod support in Tracy (only has an effect on Linux)",
+        ) orelse false,
     };
 
     const options_step = b.addOptions();
@@ -130,6 +135,10 @@ pub fn build(b: *std.Build) void {
             if (options.libunwind) {
                 tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
                 tracy.root_module.linkSystemLibrary("unwind", .{});
+            }
+            if (options.debuginfod) {
+                tracy.root_module.addCMacro("TRACY_DEBUGINFOD", "");
+                tracy.root_module.linkSystemLibrary("debuginfod", .{});
             }
         },
         else => {},
