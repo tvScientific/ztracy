@@ -64,8 +64,6 @@ pub fn build(b: *std.Build) void {
         translate_c.defineCMacro("TRACY_FIBERS", "");
     }
 
-    translate_c.defineCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
-
     const ztracy = b.addModule("root", .{
         .root_source_file = b.path("src/ztracy.zig"),
         .imports = &.{
