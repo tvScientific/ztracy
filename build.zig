@@ -107,7 +107,7 @@ pub fn build(b: *std.Build) void {
     } else {
         tracy.root_module.addCMacro("fileno", "_fileno");
     }
-    tracy.root_module.linkSystemLibrary("unwind", .{});
+    tracy.root_module.linkSystemLibrary("libunwind", .{});
 
     switch (target.result.os.tag) {
         .windows => {
