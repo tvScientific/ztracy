@@ -59,6 +59,8 @@ pub fn build(b: *std.Build) void {
         translate_c.defineCMacro("TRACY_FIBERS", "");
     }
 
+    translate_c.defineCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
+
     const ztracy = b.addModule("root", .{
         .root_source_file = b.path("src/ztracy.zig"),
         .imports = &.{
@@ -88,9 +90,7 @@ pub fn build(b: *std.Build) void {
             "-std=c++17",
         },
     });
-    tracy.root_module.addCMacro("TRACY_USE_LIBBACKTRACE", "");
     tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
-    tracy.root_module.addCMacro("TRACY_HAS_CALLSTACK", "3");
 
     if (options.enable_ztracy) tracy.root_module.addCMacro("TRACY_ENABLE", "");
     if (options.enable_fibers) tracy.root_module.addCMacro("TRACY_FIBERS", "");
