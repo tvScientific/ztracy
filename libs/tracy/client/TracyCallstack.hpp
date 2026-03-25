@@ -34,9 +34,7 @@ static tracy_force_inline void* Callstack( int32_t /*depth*/ ) { return nullptr;
 #  include <unwind.h>
 #elif TRACY_HAS_CALLSTACK >= 3
 #  ifdef TRACY_LIBUNWIND_BACKTRACE
-     // libunwind is, in general, significantly faster than execinfo based backtraces
-#    define UNW_LOCAL_ONLY
-#    include <libunwind.h>
+#    include <unwind.h>
 #  else
 #    include <execinfo.h>
 #  endif
