@@ -927,7 +927,7 @@ elf_open_debugfile_by_buildid (struct backtrace_state *state,
 
 #ifdef TRACY_DEBUGINFOD
   if (ret == -1)
-    return GetDebugInfoDescriptor( buildid_data, buildid_size, filename );
+    return GetDebugInfoDescriptor( buildid_data, buildid_size );
   else
     return ret;
 #else
