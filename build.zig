@@ -35,6 +35,11 @@ pub fn build(b: *std.Build) void {
             "libunwind",
             "Link against libunwind (only has an effect on non-Windows platforms)",
         ) orelse false,
+        .verbose = b.option(
+            bool,
+            "verbose",
+            "Enable verbose output from Tracy",
+        ) orelse false,
     };
 
     const options_step = b.addOptions();
@@ -97,6 +102,7 @@ pub fn build(b: *std.Build) void {
     if (options.enable_ztracy) tracy.root_module.addCMacro("TRACY_ENABLE", "");
     if (options.enable_fibers) tracy.root_module.addCMacro("TRACY_FIBERS", "");
     if (options.on_demand) tracy.root_module.addCMacro("TRACY_ON_DEMAND", "");
+    if (options.verbose) tracy.root_module.addCMacro("TRACY_VERBOSE", "");
     if (options.callstack > 0) {
         var callstack_buffer: [64]u8 = undefined;
         const callstack_str_len = std.fmt.printInt(&callstack_buffer, @as(u32, options.callstack), 10, .lower, .{});
