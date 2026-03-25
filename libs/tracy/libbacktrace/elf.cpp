@@ -75,7 +75,7 @@ namespace tracy
 {
 
 #ifdef TRACY_DEBUGINFOD
-int GetDebugInfoDescriptor( const char* buildid_data, size_t buildid_size );
+int GetDebugInfoDescriptor( const char* buildid_data, size_t buildid_size, const char* filename);
 #endif
 
 #if !defined(HAVE_DECL_STRNLEN) || !HAVE_DECL_STRNLEN
@@ -927,7 +927,7 @@ elf_open_debugfile_by_buildid (struct backtrace_state *state,
 
 #ifdef TRACY_DEBUGINFOD
   if (ret == -1)
-    return GetDebugInfoDescriptor( buildid_data, buildid_size );
+    return GetDebugInfoDescriptor( buildid_data, buildid_size, filename );
   else
     return ret;
 #else
