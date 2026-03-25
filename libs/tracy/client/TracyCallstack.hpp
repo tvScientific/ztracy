@@ -144,19 +144,33 @@ static tracy_force_inline void* Callstack( int32_t depth )
 
 #elif TRACY_HAS_CALLSTACK == 3 || TRACY_HAS_CALLSTACK == 4 || TRACY_HAS_CALLSTACK == 6
 
+struct BacktraceState
+{
+    void** current;
+    void** end;
+};
+
+static _Unwind_Reason_Code tracy_unwind_callback( struct _Unwind_Context* ctx, void* arg )
+{
+    auto state = (BacktraceState*)arg;
+    uintptr_t pc = _Unwind_GetIP( ctx );
+    if( pc )
+    {
+        if( state->current == state->end ) return _URC_END_OF_STACK;
+        *state->current++ = (void*)pc;
+    }
+    return _URC_NO_REASON;
+}
+
 static tracy_force_inline void* Callstack( int32_t depth )
 {
-    assert( depth >= 1 );
+    assert( depth >= 1 && depth < 63 );
 
-    auto trace = (uintptr_t*)tracy_malloc( ( 1 + (size_t)depth ) * sizeof( uintptr_t ) );
+    auto trace = (uintptr_t*)tracy_malloc( ( 1 + depth ) * sizeof( uintptr_t ) );
+    BacktraceState state = { (void**)(trace+1), (void**)(trace+1+depth) };
+    _Unwind_Backtrace( tracy_unwind_callback, &state );
 
-#ifdef TRACY_LIBUNWIND_BACKTRACE
-    size_t num =  unw_backtrace( (void**)(trace+1), depth );
-#else
-    const auto num = (size_t)backtrace( (void**)(trace+1), depth );
-#endif
-
-    *trace = num;
+    *trace = (uintptr_t*)state.current - trace + 1;
 
     return trace;
 }
