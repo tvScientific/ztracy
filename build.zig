@@ -122,8 +122,8 @@ pub fn build(b: *std.Build) void {
         },
         .linux => {
             if (options.libunwind) {
-                tracy.root_module.addIncludePath(.{ .path = "/nix/store/sp9d6b7bx3g3xm58bmymwrdrrw7wqprc-libunwind-1.8.3-dev/include" });
-                tracy.root_module.addLibraryPath(.{ .path = "/nix/store/c0k2h4l9h6qkw7f5a44jk59yn54w6df5-libunwind-1.8.3/lib" });
+                tracy.root_module.addIncludePath(.{ .cwd_relative = "/nix/store/sp9d6b7bx3g3xm58bmymwrdrrw7wqprc-libunwind-1.8.3-dev/include" });
+                tracy.root_module.addLibraryPath(.{ .cwd_relative = "/nix/store/c0k2h4l9h6qkw7f5a44jk59yn54w6df5-libunwind-1.8.3/lib" });
                 tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
                 tracy.root_module.linkSystemLibrary("unwind", .{});
             }
