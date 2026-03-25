@@ -937,7 +937,7 @@ bool SysTraceStart( int64_t& samplingPeriod )
                 fd = perf_event_open( &pe, currentPid, i, -1, PERF_FLAG_FD_CLOEXEC );
                 if( fd == -1 )
                 {
-                    TracyDebug( "  Failed to setup!\n");
+                    TracyDebug( "  Failed to setup! Errno: %d\n", errno );
                     break;
                 }
                 TracyDebug( "  No access to kernel samples\n" );
