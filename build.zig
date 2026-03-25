@@ -90,6 +90,7 @@ pub fn build(b: *std.Build) void {
     });
     tracy.root_module.addCMacro("TRACY_USE_LIBBACKTRACE", "");
     tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
+    tracy.root_module.addCMacro("TRACY_HAS_CALLSTACK", "3");
 
     if (options.enable_ztracy) tracy.root_module.addCMacro("TRACY_ENABLE", "");
     if (options.enable_fibers) tracy.root_module.addCMacro("TRACY_FIBERS", "");
