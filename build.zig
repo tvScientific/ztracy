@@ -88,6 +88,7 @@ pub fn build(b: *std.Build) void {
             "-std=c++17",
         },
     });
+    tracy.root_module.addCMacro("TRACY_LIBUNWIND_BACKTRACE", "");
 
     if (options.enable_ztracy) tracy.root_module.addCMacro("TRACY_ENABLE", "");
     if (options.enable_fibers) tracy.root_module.addCMacro("TRACY_FIBERS", "");
