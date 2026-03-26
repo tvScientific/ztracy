@@ -68,6 +68,8 @@ pub fn build(b: *std.Build) void {
         var callstack_buffer: [64]u8 = undefined;
         const callstack_str_len = std.fmt.printInt(&callstack_buffer, @as(u32, options.callstack), 10, .lower, .{});
         translate_c.defineCMacro("TRACY_CALLSTACK", callstack_buffer[0..callstack_str_len]);
+    } else {
+        translate_c.defineCMacro("TRACY_NO_CALLSTACK", "");
     }
 
     if (options.enable_fibers) {
@@ -112,6 +114,8 @@ pub fn build(b: *std.Build) void {
         var callstack_buffer: [64]u8 = undefined;
         const callstack_str_len = std.fmt.printInt(&callstack_buffer, @as(u32, options.callstack), 10, .lower, .{});
         tracy.root_module.addCMacro("TRACY_CALLSTACK", callstack_buffer[0..callstack_str_len]);
+    } else {
+        tracy.root_module.addCMacro("TRACY_NO_CALLSTACK", "");
     }
 
     tracy.root_module.link_libc = true;
