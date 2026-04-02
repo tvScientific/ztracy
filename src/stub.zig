@@ -227,3 +227,43 @@ pub const TracyAllocator = struct {
         return self.child_allocator;
     }
 };
+
+pub const LockCtx = struct {
+    pub inline fn BeforeLock(self: LockCtx) void {
+        _ = self;
+    }
+    pub inline fn AfterLock(self: LockCtx) void {
+        _ = self;
+    }
+    pub inline fn AfterUnlock(self: LockCtx) void {
+        _ = self;
+    }
+    pub inline fn AfterTryLock(self: LockCtx, success: i32) void {
+        _ = self;
+        _ = success;
+    }
+    pub inline fn Terminate(self: LockCtx) void {
+        _ = self;
+    }
+};
+
+pub inline fn Mutex(comptime src: Src) LockCtx {
+    _ = src;
+    return .{};
+}
+pub inline fn MutexN(comptime src: Src, name: [*:0]const u8) LockCtx {
+    _ = src;
+    _ = name;
+    return .{};
+}
+pub inline fn MutexC(comptime src: Src, color: u32) LockCtx {
+    _ = src;
+    _ = color;
+    return .{};
+}
+pub inline fn MutexNC(comptime src: Src, name: [*:0]const u8, color: u32) LockCtx {
+    _ = src;
+    _ = name;
+    _ = color;
+    return .{};
+}

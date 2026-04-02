@@ -124,6 +124,19 @@ pub inline fn ZoneNCS(comptime src: Src, name: [*:0]const u8, color: u32, depth:
     return initZone(src, name, color, depth);
 }
 
+pub inline fn Mutex(comptime src: Src) LockCtx {
+    return initLock(src, null, 0);
+}
+pub inline fn MutexN(comptime src: Src, name: [*:0]const u8) LockCtx {
+    return initLock(src, name, 0);
+}
+pub inline fn MutexC(comptime src: Src, color: u32) LockCtx {
+    return initLock(src, null, color);
+}
+pub inline fn MutexNC(comptime src: Src, name: [*:0]const u8, color: u32) LockCtx {
+    return initLock(src, name, color);
+}
+
 pub inline fn Alloc(ptr: ?*const anyopaque, size: usize) void {
     if (has_callstack_support) {
         c.___tracy_emit_memory_alloc_callstack(ptr, size, callstack_depth, 0);
@@ -354,11 +367,9 @@ pub const TracyAllocator = struct {
         if (result) {
             Free(buf.ptr);
             Alloc(buf.ptr, new_len);
-        } else {
-            var buffer: [128]u8 = undefined;
-            const msg = std.fmt.bufPrint(&buffer, "resize failed requesting {d} -> {d}", .{ buf.len, new_len }) catch return result;
-            Message(msg);
         }
+        // We explicitly don't message in the case of resizing failing, because it happens
+        // way too often, and it slows down profiling and causes incredible amounts of clutter.
         return result;
     }
 
@@ -393,3 +404,55 @@ pub const TracyAllocator = struct {
         Free(buf.ptr);
     }
 };
+
+pub const LockCtx = struct {
+    _lock: c.___tracy_lockable_context_data,
+
+    pub inline fn BeforeLock(self: LockCtx) void {
+        c.__tracy_before_lock_lockable_ctx(self._lock);
+    }
+    pub inline fn AfterLock(self: LockCtx) void {
+        c.__tracy_after_lock_lockable_ctx(self._lock);
+    }
+    pub inline fn AfterUnlock(self: LockCtx) void {
+        c.__tracy_after_unlock_lockable_ctx(self._lock);
+    }
+    pub inline fn AfterTryLock(self: LockCtx, success: i32) void {
+        c.__tracy_after_try_lock_lockable_ctx(self._lock, success);
+    }
+    pub inline fn Terminate(self: LockCtx) void {
+        c.__tracy_terminate_lockable_ctx(self._lock);
+    }
+};
+
+inline fn initLock(comptime src: Src, name: ?[*:0]const u8, color: u32) LockCtx {
+    // Tracy uses pointer identity to identify contexts.
+    // The `src` parameter being comptime ensures that
+    // each zone gets its own unique global location for this
+    // struct.
+    const static = struct {
+        var loc: c.___tracy_source_location_data = undefined;
+
+        // Ensure that a unique struct type is generated for each unique `src`. See
+        // https://github.com/ziglang/zig/issues/18816
+        comptime {
+            // https://github.com/ziglang/zig/issues/19274
+            _ = @sizeOf(@TypeOf(src));
+        }
+    };
+    static.loc = .{
+        .name = name,
+        .function = src.fn_name.ptr,
+        .file = src.file.ptr,
+        .line = src.line,
+        .color = color,
+    };
+
+    const lock = c.__tracy_announce_lockable_ctx(&static.loc);
+
+    if (name) |n| {
+        c.__tracy_tracy_custom_name_lockable_ctx(lock, n.ptr, n.len);
+    }
+
+    return LockCtx{ ._lock = lock };
+}

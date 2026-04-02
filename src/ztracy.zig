@@ -21,6 +21,7 @@ const stub = @import("stub.zig");
 const impl = @import("impl.zig");
 
 pub const ZoneCtx = if (enabled) impl.ZoneCtx else stub.ZoneCtx;
+pub const LockCtx = if (enabled) impl.LockCtx else stub.LockCtx;
 
 pub const SetThreadName = if (enabled) impl.SetThreadName else stub.SetThreadName;
 
@@ -32,6 +33,11 @@ pub const ZoneS = if (enabled) impl.ZoneS else stub.ZoneS;
 pub const ZoneNS = if (enabled) impl.ZoneNS else stub.ZoneNS;
 pub const ZoneCS = if (enabled) impl.ZoneCS else stub.ZoneCS;
 pub const ZoneNCS = if (enabled) impl.ZoneNCS else stub.ZoneNCS;
+
+pub const Mutex = if (enabled) impl.Mutex else stub.Mutex;
+pub const MutexN = if (enabled) impl.MutexN else stub.MutexN;
+pub const MutexC = if (enabled) impl.MutexC else stub.MutexC;
+pub const MutexNC = if (enabled) impl.MutexNC else stub.MutexNC;
 
 pub const Alloc = if (enabled) impl.Alloc else stub.Alloc;
 pub const Free = if (enabled) impl.Free else stub.Free;
